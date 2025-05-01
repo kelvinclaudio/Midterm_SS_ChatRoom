@@ -23,12 +23,10 @@ function App() {
 
   return (
     <div className="d-flex" style={{ height: "100vh" }}>
-      {/* Sidebar */}
       <div className="bg-dark text-white sidebar-slide" style={sidebarStyle}>
         <Sidebar />
       </div>
 
-      {/* Mobile backdrop */}
       {showBackdrop && (
         <div
           className="d-md-none"
@@ -45,7 +43,6 @@ function App() {
         />
       )}
 
-      {/* Main Chat Area */}
       <div
         className="flex-grow-1"
         style={{

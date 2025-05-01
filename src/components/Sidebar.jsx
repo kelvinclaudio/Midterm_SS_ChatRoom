@@ -1,4 +1,5 @@
 import { useState } from "react";
+import UserProfile from "./UserProfile";
 
 function Sidebar() {
   const [showModal, setShowModal] = useState(false);
@@ -24,6 +25,34 @@ function Sidebar() {
       time: "12:09 PM",
     },
     { name: "kerja kelompok", message: "wah tai", time: "1:25 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
+    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
     { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
   ];
 
@@ -56,6 +85,10 @@ function Sidebar() {
             <div className="text-muted small ms-2">{chat.time}</div>
           </div>
         ))}
+      </div>
+
+      <div className="position-absolute bottom-0 start-0 w-100">
+        <UserProfile />
       </div>
 
       {showModal && (
