@@ -1,7 +1,62 @@
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
+import { useEffect, useState } from "react";
+import { get, ref, onChildAdded } from "firebase/database";
+import { auth, database } from "../firebase";
 
-function ChatWindow({ onToggleSidebar }) {
+function ChatWindow({ room, onToggleSidebar }) {
+  if (!room) {
+    return (
+      <div className="h-100 d-flex align-items-center justify-content-center text-muted">
+        Select a room to start chatting.
+      </div>
+    );
+  }
+  const [messages, setMessages] = useState([]);
+  const [usernames, setUsernames] = useState({});
+
+  useEffect(() => {
+    if (!room?.key) return;
+
+    const messagesRef = ref(database, `chatrooms/${room.key}/messages`);
+    setMessages([]);
+    setUsernames({});
+
+    const unsubscribe = onChildAdded(messagesRef, async (snapshot) => {
+      const msg = snapshot.val();
+
+      // Show a notification if message is from someone else
+      if (
+        msg.sender !== auth.currentUser?.uid &&
+        Notification.permission === "granted"
+      ) {
+        new Notification("New message", {
+          body: msg.text,
+          icon: "/assets/img/chat-icon.png", // optional: custom icon
+        });
+      }
+
+      // Fetch username if not already cached
+      if (!usernames[msg.sender]) {
+        const userRef = ref(database, `users/${msg.sender}`);
+        const userSnap = await get(userRef);
+        if (userSnap.exists()) {
+          const userData = userSnap.val();
+          setUsernames((prev) => ({
+            ...prev,
+            [msg.sender]: {
+              username: userData.username,
+              profileImage: userData.profileImage || "/assets/img/avatar1.png",
+            },
+          }));
+        }
+      }
+
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    return () => unsubscribe();
+  }, [room]);
   return (
     <div className="d-flex flex-column h-100">
       <div className="bg-dark text-white p-3 d-flex align-items-center justify-content-between">
@@ -29,139 +84,38 @@ function ChatWindow({ onToggleSidebar }) {
           </button>
 
           <img
-            src="https://via.placeholder.com/40"
+            src={room.groupImage || "/assets/img/groupImg.png"}
             alt="Group"
             className="rounded-circle bg-light me-2"
             style={{ width: "40px", height: "40px", objectFit: "cover" }}
           />
-          <span className="fw-bold">Warung Bang Yana</span>
+          <span className="fw-bold">{room.name}</span>
         </div>
       </div>
 
       <div className="flex-grow-1 p-3 overflow-auto bg-secondary-subtle">
-        <ChatMessage
-          sender="Didik"
-          message="Sudah di dorm 13 ya"
-          time="12:09 PM"
-          isOwnMessage={false}
-        />
-        <ChatMessage
-          sender="Me"
-          message="Oke aku otw"
-          time="12:10 PM"
-          isOwnMessage={true}
-        />
-        <ChatMessage
-          sender="Didik"
-          message="Sudah di dorm 13 ya"
-          time="12:09 PM"
-          isOwnMessage={false}
-        />
-        <ChatMessage
-          sender="Me"
-          message="Oke aku otw"
-          time="12:10 PM"
-          isOwnMessage={true}
-        />
-        <ChatMessage
-          sender="Didik"
-          message="Sudah di dorm 13 ya"
-          time="12:09 PM"
-          isOwnMessage={false}
-        />
-        <ChatMessage
-          sender="Me"
-          message="Oke aku otw"
-          time="12:10 PM"
-          isOwnMessage={true}
-        />
-        <ChatMessage
-          sender="Didik"
-          message="Sudah di dorm 13 ya"
-          time="12:09 PM"
-          isOwnMessage={false}
-        />
-        <ChatMessage
-          sender="Me"
-          message="Oke aku otw"
-          time="12:10 PM"
-          isOwnMessage={true}
-        />
-        <ChatMessage
-          sender="Didik"
-          message="Sudah di dorm 13 ya"
-          time="12:09 PM"
-          isOwnMessage={false}
-        />
-        <ChatMessage
-          sender="Me"
-          message="Oke aku otw"
-          time="12:10 PM"
-          isOwnMessage={true}
-        />
-        <ChatMessage
-          sender="Didik"
-          message="Sudah di dorm 13 ya"
-          time="12:09 PM"
-          isOwnMessage={false}
-        />
-        <ChatMessage
-          sender="Me"
-          message="Oke aku otw"
-          time="12:10 PM"
-          isOwnMessage={true}
-        />
-        <ChatMessage
-          sender="Didik"
-          message="Sudah di dorm 13 ya"
-          time="12:09 PM"
-          isOwnMessage={false}
-        />
-        <ChatMessage
-          sender="Me"
-          message="Oke aku otw"
-          time="12:10 PM"
-          isOwnMessage={true}
-        />
-        <ChatMessage
-          sender="Didik"
-          message="Sudah di dorm 13 ya"
-          time="12:09 PM"
-          isOwnMessage={false}
-        />
-        <ChatMessage
-          sender="Me"
-          message="Oke aku otw"
-          time="12:10 PM"
-          isOwnMessage={true}
-        />
-        <ChatMessage
-          sender="Didik"
-          message="Sudah di dorm 13 ya"
-          time="12:09 PM"
-          isOwnMessage={false}
-        />
-        <ChatMessage
-          sender="Me"
-          message="Oke aku otw"
-          time="12:10 PM"
-          isOwnMessage={true}
-        />
-        <ChatMessage
-          sender="Didik"
-          message="Sudah di dorm 13 ya"
-          time="12:09 PM"
-          isOwnMessage={false}
-        />
-        <ChatMessage
-          sender="Me"
-          message="Oke aku otw"
-          time="12:10 PM"
-          isOwnMessage={true}
-        />
+        {messages.map((msg, i) => (
+          <ChatMessage
+            key={i}
+            sender={
+              msg.sender === auth.currentUser?.uid
+                ? "Me"
+                : usernames[msg.sender]?.username || "Unknown"
+            }
+            message={msg.text}
+            time={new Date(msg.timestamp).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+            isOwnMessage={msg.sender === auth.currentUser?.uid}
+            profileImage={
+              usernames[msg.sender]?.profileImage || "/assets/img/avatar1.png"
+            }
+          />
+        ))}
       </div>
 
-      <ChatInput />
+      <ChatInput roomKey={room.key} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-function ChatMessage({ sender, message, time, isOwnMessage }) {
+function ChatMessage({ sender, message, time, isOwnMessage, profileImage }) {
   return (
     <div
       className={`d-flex ${
@@ -6,13 +6,18 @@ function ChatMessage({ sender, message, time, isOwnMessage }) {
       } mb-3`}
     >
       {!isOwnMessage && (
-        <div className="me-2">
-          <div
-            className="rounded-circle bg-secondary"
-            style={{ width: 32, height: 32 }}
-            title={sender}
-          />
-        </div>
+        <img
+          src={profileImage}
+          alt="profile"
+          className="me-2"
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            objectFit: "cover",
+            backgroundColor: "white",
+          }}
+        />
       )}
 
       <div>

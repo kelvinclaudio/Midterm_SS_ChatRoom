@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
@@ -6,7 +6,16 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   const [showSidebar, setShowSidebar] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
   const isDesktop = useMediaQuery({ minWidth: 768 });
+
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission().then((permission) => {
+        console.log("Notification permission:", permission);
+      });
+    }
+  }, []);
 
   const sidebarStyle = {
     width: "300px",
@@ -24,7 +33,12 @@ function App() {
   return (
     <div className="d-flex" style={{ height: "100vh" }}>
       <div className="bg-dark text-white sidebar-slide" style={sidebarStyle}>
-        <Sidebar />
+        <Sidebar
+          onSelectRoom={(room) => {
+            setSelectedRoom(room);
+            if (!isDesktop) setShowSidebar(false); // auto-close sidebar on mobile
+          }}
+        />
       </div>
 
       {showBackdrop && (
@@ -51,7 +65,10 @@ function App() {
           height: "100%",
         }}
       >
-        <ChatWindow onToggleSidebar={() => setShowSidebar((prev) => !prev)} />
+        <ChatWindow
+          room={selectedRoom}
+          onToggleSidebar={() => setShowSidebar((prev) => !prev)}
+        />
       </div>
     </div>
   );

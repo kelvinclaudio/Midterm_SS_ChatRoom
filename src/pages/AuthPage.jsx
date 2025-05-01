@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { auth } from "../firebase";
+import { auth, database } from "../firebase";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
+import { ref, set } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 
 function AuthPage() {
@@ -11,6 +12,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -20,6 +22,7 @@ function AuthPage() {
     setEmail("");
     setPassword("");
     setConfirm("");
+    setUsername("");
   };
 
   const handleSubmit = async () => {
@@ -31,7 +34,33 @@ function AuthPage() {
         if (password !== confirm) {
           return setError("Passwords don't match");
         }
-        await createUserWithEmailAndPassword(auth, email, password);
+        if (!username.trim()) {
+          return setError("Username is required");
+        }
+
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
+
+        const profileImages = [
+          "/assets/img/avatar1.png",
+          "/assets/img/avatar2.png",
+          "/assets/img/avatar3.png",
+        ];
+
+        const randomImage =
+          profileImages[Math.floor(Math.random() * profileImages.length)];
+
+        await set(ref(database, "users/" + user.uid), {
+          uid: user.uid,
+          email: user.email,
+          username: username,
+          profileImage: randomImage, // add this
+          createdAt: new Date().toISOString(),
+        });
       }
       navigate("/");
     } catch (err) {
@@ -55,6 +84,16 @@ function AuthPage() {
         </p>
 
         {error && <div className="alert alert-danger text-center">{error}</div>}
+
+        {mode === "register" && (
+          <input
+            className="form-control mb-3"
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        )}
 
         <input
           className="form-control mb-3"

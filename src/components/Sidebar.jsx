@@ -1,60 +1,109 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { auth, database } from "../firebase";
+import { push, ref, set, get, update, onValue } from "firebase/database";
 import UserProfile from "./UserProfile";
 
-function Sidebar() {
+function Sidebar({ onSelectRoom }) {
   const [showModal, setShowModal] = useState(false);
   const [mode, setMode] = useState("create");
   const [inputValue, setInputValue] = useState("");
+  const [username, setUsername] = useState("");
+  const [profileImage, setProfileImage] = useState("");
+  const [userRooms, setUserRooms] = useState([]);
 
-  const handleSubmit = () => {
-    if (inputValue.trim()) {
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      const userRef = ref(database, "users/" + user.uid);
+      get(userRef)
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            setUsername(data.username);
+            setProfileImage(data.profileImage);
+            console.log(data);
+          } else {
+            console.log("No user data found.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+
+      const chatroomsRef = ref(database, "chatrooms");
+      onValue(chatroomsRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const rooms = snapshot.val();
+          const filteredRooms = [];
+
+          for (const key in rooms) {
+            if (rooms[key].members && rooms[key].members[user.uid]) {
+              filteredRooms.push({
+                key,
+                name: rooms[key].name,
+                groupImage:
+                  rooms[key].groupImage || "/assets/img/groupProfile.png",
+              });
+              console.log(rooms[key].groupImage);
+            }
+          }
+
+          setUserRooms(filteredRooms);
+        } else {
+          setUserRooms([]); // no rooms found
+        }
+      });
+    }
+  }, []);
+
+  const handleSubmit = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    if (!inputValue.trim()) return;
+
+    try {
       if (mode === "create") {
-        alert(`Creating group: ${inputValue}`);
+        // Create a new chatroom with a unique key
+        const roomKey = push(ref(database, "chatrooms")).key;
+        await set(ref(database, `chatrooms/${roomKey}`), {
+          name: inputValue,
+          createdBy: user.uid,
+          groupImage: "/assets/img/groupProfile.png",
+          createdAt: Date.now(),
+          members: {
+            [user.uid]: true,
+          },
+          messages: {},
+        });
+
+        alert(`Group "${inputValue}" created! Group code: ${roomKey}`);
       } else {
-        alert(`Joining group with code: ${inputValue}`);
+        // Join existing chatroom
+        const roomKey = inputValue.trim();
+        const roomRef = ref(database, `chatrooms/${roomKey}`);
+        const snapshot = await get(roomRef);
+
+        if (snapshot.exists()) {
+          await update(ref(database, `chatrooms/${roomKey}/members`), {
+            [user.uid]: true,
+          });
+          alert(`Joined group "${snapshot.val().name}"`);
+        } else {
+          alert("Group not found. Check the code and try again.");
+          return;
+        }
       }
+
       setInputValue("");
       setShowModal(false);
+    } catch (error) {
+      console.error("Error in chatroom handling:", error);
+      alert("Something went wrong. Please try again.");
     }
   };
 
-  const chats = [
-    {
-      name: "Warung Bang Yana",
-      message: "Sudah di dorm 13 ya",
-      time: "12:09 PM",
-    },
-    { name: "kerja kelompok", message: "wah tai", time: "1:25 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-    { name: "Geraldo Yovan", message: "You were mentioned.", time: "12:24 PM" },
-  ];
+  // const chats = userRooms;
 
   return (
     <>
@@ -72,17 +121,28 @@ function Sidebar() {
           </button>
         </div>
 
-        {chats.map((chat, i) => (
-          <div key={i} className="d-flex align-items-center py-2 border-bottom">
-            <div
-              className="rounded-circle bg-secondary me-2"
-              style={{ width: 40, height: 40 }}
-            ></div>
+        {userRooms.map((chat, i) => (
+          <div
+            key={i}
+            className="d-flex align-items-center py-2 border-bottom"
+            onClick={() => onSelectRoom(chat)}
+          >
+            <img
+              src={chat.groupImage}
+              alt="profile"
+              className="me-2"
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                backgroundColor: "white",
+              }}
+            />
             <div className="flex-grow-1">
               <div className="fw-bold">{chat.name}</div>
-              <small>{chat.message}</small>
+              <small>Code: {chat.key}</small>
             </div>
-            <div className="text-muted small ms-2">{chat.time}</div>
           </div>
         ))}
       </div>

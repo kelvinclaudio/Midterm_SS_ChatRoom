@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { auth } from "../firebase";
+import { useEffect, useState } from "react";
+import { auth, database } from "../firebase";
+import { ref, get, update } from "firebase/database";
 import { useAuth } from "../AuthContext";
 import { signOut } from "firebase/auth";
 
@@ -7,6 +8,30 @@ function UserProfile() {
   const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [displayName, setDisplayName] = useState(user?.displayName || "");
+  const [username, setUsername] = useState("");
+  const [profileImage, setProfileImage] = useState("");
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      const userRef = ref(database, "users/" + user.uid);
+      get(userRef)
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            setUsername(data.username);
+            setDisplayName(data.username);
+            setProfileImage(data.profileImage);
+            console.log(data);
+          } else {
+            console.log("No user data found.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+    }
+  }, []);
 
   const handleLogout = () => {
     signOut(auth);
@@ -14,8 +39,23 @@ function UserProfile() {
   };
 
   const handleSave = () => {
-    alert(`Saved name: ${displayName}`);
-    setShowModal(false);
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      const userRef = ref(database, "users/" + currentUser.uid);
+      update(userRef, {
+        username: displayName,
+        profileImage: profileImage,
+      })
+        .then(() => {
+          setUsername(displayName);
+          alert("Username updated successfully!");
+          setShowModal(false);
+        })
+        .catch((error) => {
+          console.error("Failed to update username:", error);
+          alert("Failed to update username.");
+        });
+    }
   };
 
   if (!user) return null;
@@ -27,16 +67,24 @@ function UserProfile() {
         style={{ height: "64px" }}
       >
         <div className="d-flex align-items-center">
-          <div
-            className="rounded-circle bg-secondary me-2"
-            style={{ width: 40, height: 40 }}
-          ></div>
+          <img
+            src={profileImage}
+            alt="profile"
+            className="me-2"
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              objectFit: "cover",
+              backgroundColor: "white",
+            }}
+          />
           <div>
             <div
               className="fw-semibold text-truncate"
               style={{ maxWidth: "140px" }}
             >
-              {user.email.split("@")[0]}
+              {username}
             </div>
           </div>
         </div>
@@ -77,15 +125,28 @@ function UserProfile() {
                   <h5 className="modal-title">Profile Settings</h5>
                   <button
                     className="btn-close"
-                    onClick={() => setShowModal(false)}
+                    onClick={() => {
+                      setDisplayName(username);
+                      setProfileImage(profileImage);
+                      setShowModal(false);
+                    }}
                   />
                 </div>
 
                 <div className="modal-body text-center">
-                  <div
-                    className="rounded-circle bg-secondary mx-auto mb-3"
-                    style={{ width: 100, height: 100 }}
-                  ></div>
+                  <img
+                    src={profileImage}
+                    alt="profile"
+                    className="me-2"
+                    style={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      backgroundColor: "white",
+                      border: "1px solid black",
+                    }}
+                  />
 
                   <div className="mb-3 text-start">
                     <label className="form-label">Display Name</label>

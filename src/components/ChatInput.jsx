@@ -1,12 +1,28 @@
 import { useState } from "react";
+import { auth, database } from "../firebase";
+import { ref, push } from "firebase/database";
 
-function ChatInput() {
+function ChatInput({ roomKey }) {
   const [message, setMessage] = useState("");
 
-  const handleSend = () => {
-    if (message.trim()) {
-      console.log("Sending:", message);
+  const handleSend = async () => {
+    const trimmed = message.trim();
+    if (!trimmed || !roomKey) return;
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const messageObj = {
+      text: trimmed,
+      sender: user.uid,
+      timestamp: Date.now(),
+    };
+
+    try {
+      await push(ref(database, `chatrooms/${roomKey}/messages`), messageObj);
       setMessage("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
     }
   };
 
