@@ -19,20 +19,16 @@ function App() {
     transition: "transform 0.3s ease-in-out",
   };
 
-  const chatWindowStyle = {
-    height: "100%",
-    marginLeft: isDesktop ? "300px" : "0",
-    transition: "margin-left 0.3s ease",
-  };
-
   const showBackdrop = !isDesktop && showSidebar;
 
   return (
-    <div className="position-relative h-100" style={{ height: "100vh" }}>
+    <div className="d-flex" style={{ height: "100vh" }}>
+      {/* Sidebar */}
       <div className="bg-dark text-white sidebar-slide" style={sidebarStyle}>
         <Sidebar />
       </div>
 
+      {/* Mobile backdrop */}
       {showBackdrop && (
         <div
           className="d-md-none"
@@ -49,7 +45,15 @@ function App() {
         />
       )}
 
-      <div style={chatWindowStyle}>
+      {/* Main Chat Area */}
+      <div
+        className="flex-grow-1"
+        style={{
+          marginLeft: isDesktop ? "300px" : "0",
+          transition: "margin-left 0.3s ease",
+          height: "100%",
+        }}
+      >
         <ChatWindow onToggleSidebar={() => setShowSidebar((prev) => !prev)} />
       </div>
     </div>

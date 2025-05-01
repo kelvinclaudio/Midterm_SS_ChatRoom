@@ -13,3 +13,10 @@ body,
 .modal {
   backdrop-filter: blur(3px);
 }
+
+.auth-container {
+  background: linear-gradient(to right, #fdfbfb, #ebedee);
+}
+input::placeholder {
+  font-size: 0.9rem;
+}

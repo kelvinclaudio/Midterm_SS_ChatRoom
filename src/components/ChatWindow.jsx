@@ -51,6 +51,114 @@ function ChatWindow({ onToggleSidebar }) {
           time="12:10 PM"
           isOwnMessage={true}
         />
+        <ChatMessage
+          sender="Didik"
+          message="Sudah di dorm 13 ya"
+          time="12:09 PM"
+          isOwnMessage={false}
+        />
+        <ChatMessage
+          sender="Me"
+          message="Oke aku otw"
+          time="12:10 PM"
+          isOwnMessage={true}
+        />
+        <ChatMessage
+          sender="Didik"
+          message="Sudah di dorm 13 ya"
+          time="12:09 PM"
+          isOwnMessage={false}
+        />
+        <ChatMessage
+          sender="Me"
+          message="Oke aku otw"
+          time="12:10 PM"
+          isOwnMessage={true}
+        />
+        <ChatMessage
+          sender="Didik"
+          message="Sudah di dorm 13 ya"
+          time="12:09 PM"
+          isOwnMessage={false}
+        />
+        <ChatMessage
+          sender="Me"
+          message="Oke aku otw"
+          time="12:10 PM"
+          isOwnMessage={true}
+        />
+        <ChatMessage
+          sender="Didik"
+          message="Sudah di dorm 13 ya"
+          time="12:09 PM"
+          isOwnMessage={false}
+        />
+        <ChatMessage
+          sender="Me"
+          message="Oke aku otw"
+          time="12:10 PM"
+          isOwnMessage={true}
+        />
+        <ChatMessage
+          sender="Didik"
+          message="Sudah di dorm 13 ya"
+          time="12:09 PM"
+          isOwnMessage={false}
+        />
+        <ChatMessage
+          sender="Me"
+          message="Oke aku otw"
+          time="12:10 PM"
+          isOwnMessage={true}
+        />
+        <ChatMessage
+          sender="Didik"
+          message="Sudah di dorm 13 ya"
+          time="12:09 PM"
+          isOwnMessage={false}
+        />
+        <ChatMessage
+          sender="Me"
+          message="Oke aku otw"
+          time="12:10 PM"
+          isOwnMessage={true}
+        />
+        <ChatMessage
+          sender="Didik"
+          message="Sudah di dorm 13 ya"
+          time="12:09 PM"
+          isOwnMessage={false}
+        />
+        <ChatMessage
+          sender="Me"
+          message="Oke aku otw"
+          time="12:10 PM"
+          isOwnMessage={true}
+        />
+        <ChatMessage
+          sender="Didik"
+          message="Sudah di dorm 13 ya"
+          time="12:09 PM"
+          isOwnMessage={false}
+        />
+        <ChatMessage
+          sender="Me"
+          message="Oke aku otw"
+          time="12:10 PM"
+          isOwnMessage={true}
+        />
+        <ChatMessage
+          sender="Didik"
+          message="Sudah di dorm 13 ya"
+          time="12:09 PM"
+          isOwnMessage={false}
+        />
+        <ChatMessage
+          sender="Me"
+          message="Oke aku otw"
+          time="12:10 PM"
+          isOwnMessage={true}
+        />
       </div>
 
       <ChatInput />
